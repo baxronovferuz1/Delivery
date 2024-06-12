@@ -7,8 +7,8 @@ class SignUpModel(BaseModel):
     username:str
     email:str
     password:str
-    is_staff=Optional[bool]
-    is_active=Optional[bool]
+    is_staff:Optional[bool]
+    is_active:Optional[bool]
 
 
     class Config:

@@ -8,7 +8,7 @@ from database import Base
 class User(Base):
     __tablename__="user"
     id=Column(String, primary_key=True)
-    username=Column(String(String(25), unique=True))
+    username=Column(String(25), unique=True)
     email=Column(String(80), unique=True)
     password=Column(Text, nullable=True)
     is_staff=Column(Boolean, default=False)
@@ -45,7 +45,7 @@ class Product(Base):
     id=Column(Integer, primary_key=True)
     name=Column(String(100))
     price=Column(Integer)
-    orders=relationship('Order', back_populates='user')
+    orders=relationship('Order', back_populates='product')
 
     def __repr__(self):
         return f"<product {self.name}"
