@@ -40,5 +40,13 @@ async def signup(user: SignUpModel):
     )
     session.add(new_user)
     session.commit()
+    response_model={
+        'id':new_user.id,
+        'username':new_user.username,
+        'email':new_user.email,
+        'is_staff':new_user.is_staff,
+        'is_active':new_user.is_active
 
-    return new_user
+    }
+
+    return response_model

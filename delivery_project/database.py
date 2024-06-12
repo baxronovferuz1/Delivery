@@ -6,4 +6,4 @@ engine=create_engine('postgresql://postgres:feruz2003@localhost/delivery_db', ec
 
 
 Base=declarative_base()
-session=sessionmaker()
+session=sessionmaker(bind=engine)
