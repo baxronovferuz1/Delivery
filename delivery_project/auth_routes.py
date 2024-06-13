@@ -40,13 +40,20 @@ async def signup(user: SignUpModel):
     )
     session.add(new_user)
     session.commit()
-    response_model={
+    data={
         'id':new_user.id,
         'username':new_user.username,
         'email':new_user.email,
         'is_staff':new_user.is_staff,
         'is_active':new_user.is_active
 
+    }
+
+    response_model={
+        'success':True,
+        'code':201,
+        'message':'user is created succesfully',
+        'data':data
     }
 
     return response_model
