@@ -2,12 +2,13 @@ from sqlalchemy import Column,Integer,Boolean,Text,String,ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils.types import ChoiceType
 from database import Base
+from sqlalchemy.ext.declarative import declarative_base
 
-
+Base = declarative_base()
 
 class User(Base):
     __tablename__="user"
-    id=Column(Integer, primary_key=True)
+    id=Column(Integer, primary_key=True, autoincrement=True)
     username=Column(String(25), unique=True)
     email=Column(String(80), unique=True)
     password=Column(Text, nullable=True)

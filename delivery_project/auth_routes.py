@@ -8,14 +8,19 @@ from fastapi_jwt_auth import AuthJWT
 from fastapi.encoders import jsonable_encoder
 
 auth_router = APIRouter(
-    prefix="/auth",
+    prefix="/auth"
 )
 
 session=session(bind=engine)
 
 
 @auth_router.get("/")
-async def signup():
+async def signup(Authorize: AuthJWT=Depends()):
+    try:
+        Authorize.jwt_required()
+
+    except Exception  as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token")
     return {"message": "bu auth route signup sahifasi"}
 
 
