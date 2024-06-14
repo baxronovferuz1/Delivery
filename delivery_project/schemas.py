@@ -13,6 +13,7 @@ class SignUpModel(BaseModel):
 
     class Config:
         orm_mode=True
+        # from_attributes = True
         schema_extra={            #example for user
             'example':{
                 'username':'hasan',
