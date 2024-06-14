@@ -6,6 +6,7 @@ from fastapi.exceptions import HTTPException
 from werkzeug.security import generate_password_hash,check_password_hash
 from fastapi_jwt_auth import AuthJWT
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import or_ 
 
 auth_router = APIRouter(
     prefix="/auth"
@@ -66,9 +67,17 @@ async def signup(user: SignUpModel):
 
 
 @auth_router.post('login/', status_code=200)
-async def login(user:LoginModel, Authorize:AuthJWT=Depends()): #lofin funskiyasi AuhtJWT obyektini argument sifatida jo'natadi
+async def login(user:LoginModel, Authorize:AuthJWT=Depends()): #login funskiyasi AuhtJWT obyektini argument sifatida jo'natadi
 
-    db_user=session.query(User).filter(User.username==user.username).first()
+    # db_user=session.query(User).filter(User.username==user.username).first()
+
+    db_user=session.query(User).filter(
+        or_(
+            User.username==user.username_or_email,
+            User.email==user.username_or_email
+        )
+    ).first()
+    print('user', db_user)
     if db_user and check_password_hash(db_user.password, user.password):
         access_token=Authorize.create_access_token(subject=db_user.username)
         refresh_token=Authorize.create_refresh_token(subject=db_user.username)
