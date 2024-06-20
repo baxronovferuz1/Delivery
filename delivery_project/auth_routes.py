@@ -16,7 +16,7 @@ session=session(bind=engine)
 
 
 @auth_router.get("/")
-async def signup(Authorize: AuthJWT=Depends()):
+async def welcome(Authorize: AuthJWT=Depends()):
     try:
         Authorize.jwt_required()
 
@@ -97,3 +97,35 @@ async def login(user:LoginModel, Authorize:AuthJWT=Depends()): #login funskiyasi
         return jsonable_encoder(response)  #responsedagilar dict bo'lib keladi,jsonable_encoder shuni json ko'rinishida to'g'irlab beradi
     
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='invalid username or password')
+
+
+@auth_router.get('/login/refresh')
+async def refresh_token(Authorize: AuthJWT=Depends()):
+
+    try:
+        Authorize.jwt_required()  #hozirda yaroqli access tokenni talab qiladi
+
+        current_user=Authorize.get_jwt_subject  #kiritilgan access tokendan usernameni ajratib oladi
+
+
+        #Databasedan userni filter orqali topamiz
+        #session bilan databasega bog'laniladi
+        db_user=session.query(User).filter(User.username==current_user).first()
+        if db_user is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        
+
+        #access token yaratiladi
+        new_access_token=Authorize.create_access_token(subject=db_user.username)
+        response_model={
+            'success':True,
+            'code':200,
+            'message':'new access token created',
+            'data':{
+                "access_token":new_access_token
+            }
+        }
+        return response_model
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token")
