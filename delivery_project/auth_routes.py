@@ -103,7 +103,7 @@ async def login(user:LoginModel, Authorize:AuthJWT=Depends()): #login funskiyasi
 async def refresh_token(Authorize: AuthJWT=Depends()):
 
     try:
-        Authorize.jwt_required()  #hozirda yaroqli access tokenni talab qiladi
+        Authorize.jwt_refresh_token_required()  #hozirda yaroqli access tokenni talab qiladi
 
         current_user=Authorize.get_jwt_subject  #kiritilgan access tokendan usernameni ajratib oladi
 
@@ -128,4 +128,4 @@ async def refresh_token(Authorize: AuthJWT=Depends()):
         return response_model
 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
