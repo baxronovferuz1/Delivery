@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from fastapi_jwt_auth import AuthJWT
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import or_ 
+import datetime
 
 auth_router = APIRouter(
     prefix="/auth"
@@ -79,8 +80,10 @@ async def login(user:LoginModel, Authorize:AuthJWT=Depends()): #login funskiyasi
     ).first()
     print('user', db_user)
     if db_user and check_password_hash(db_user.password, user.password):
-        access_token=Authorize.create_access_token(subject=db_user.username)
-        refresh_token=Authorize.create_refresh_token(subject=db_user.username)
+        access_lifetime=datetime.timedelta(minutes=2)
+        refresh_lifetime=datetime.timedelta(days=4)
+        access_token=Authorize.create_access_token(subject=db_user.username, expires_time=access_lifetime)
+        refresh_token=Authorize.create_refresh_token(subject=db_user.username, expires_time=refresh_lifetime)
 
         token={
             'access':access_token,
@@ -103,7 +106,8 @@ async def login(user:LoginModel, Authorize:AuthJWT=Depends()): #login funskiyasi
 async def refresh_token(Authorize: AuthJWT=Depends()):
 
     try:
-        Authorize.jwt_refresh_token_required()  #hozirda yaroqli access tokenni talab qiladi
+        access_lifetime=datetime.timedelta(minutes=1)
+        Authorize.jwt_refresh_token_required()  #hozirda yaroqli refresh tokenni talab qiladi
 
         current_user=Authorize.get_jwt_subject  #kiritilgan access tokendan usernameni ajratib oladi
 
@@ -116,7 +120,7 @@ async def refresh_token(Authorize: AuthJWT=Depends()):
         
 
         #access token yaratiladi
-        new_access_token=Authorize.create_access_token(subject=db_user.username)
+        new_access_token=Authorize.create_access_token(subject=db_user.username, expires_time=access_lifetime)
         response_model={
             'success':True,
             'code':200,
