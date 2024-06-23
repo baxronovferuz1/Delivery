@@ -61,3 +61,19 @@ class OrderStatusModel(BaseModel):
                 "order_statuses":"PENDING"
             }
         }
+
+
+class ProductModel(BaseModel):
+    id:Optional[int]
+    name:str
+    price:int
+
+
+    class Config:
+        orm_model=True
+        schema_extra={
+            "example":{
+                "name":"Pizza",
+                "price": 30000
+            }
+        }
