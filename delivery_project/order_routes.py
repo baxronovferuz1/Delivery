@@ -72,11 +72,40 @@ async def order_list(Authorize:AuthJWT=Depends()):
 
     if user.is_staff():
         orders=session.query(Order).all()
+        data=[
+            {
+                "id":order.id,
+                "user":{
+                    "id":order.user.id,
+                    "username":order.user.username,
+                    "email":order.user.email
+                },
+                "product_id":order.product_id,
+                "quantity":order.quantity,
+                "order_statuses":order.order_status.value,
+            }
+            for order in orders
+        ]
         return jsonable_encoder(orders)
     
     else:
-        HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only superadmin can see all orders") #The user is authorized, but does not have permission
 
 
+
+@order_router.get("/{id}")
+async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
+
+
+    try:
+        Authorize.jwt_required()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The user is not authorized,enter valid access token")
+    
+    user=Authorize.get_jwt_subject()
+    current_user=session.query(User).filter(User.username==user).first()
+
+    if current_user.is_staff:
+        order=session.query(Order).filter(Order.id==id)
 
 
