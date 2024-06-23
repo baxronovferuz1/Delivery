@@ -42,11 +42,17 @@ async def make_order(order:OrderModel, Authorize:AuthJWT=Depends()):
     new_order.user=user
     session.add(new_order)
     session.commit()
-
-    response={
-        "id":new_order.id,
-        "quantity":new_order.quantity,
-        "order_statuses":new_order.order_status,
+    data={
+        "success":True,
+        "code":201,
+        "message":"new order succesfully created",
+        "data":{
+            "id":new_order.id,
+            "quantity":new_order.quantity,
+            "order_statuses":new_order.order_status,
     }
+    }
+
+    response=data
 
     return jsonable_encoder(response)
