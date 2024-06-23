@@ -30,7 +30,7 @@ async def make_order(order:OrderModel, Authorize:AuthJWT=Depends()):
     try:
         Authorize.jwt_required()
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Enter valid access token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,  detail="Enter valid access token")
     
     current_user=Authorize.get_jwt_subject()
     user=session.query(User).filter(User.username==current_user).first()
@@ -56,3 +56,27 @@ async def make_order(order:OrderModel, Authorize:AuthJWT=Depends()):
     response=data
 
     return jsonable_encoder(response)
+
+
+@order_router.get("/list", status_code=status.HTTP_201_CREATED)
+async def order_list(Authorize:AuthJWT=Depends()):
+
+    try:
+        Authorize.jwt_required()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The user is not authorized,enter valid access token")
+    
+    current_user=Authorize.get_jwt_subject()
+    user=session.query(User).filter(User.username==current_user).first()
+
+
+    if user.is_staff():
+        orders=session.query(Order).all()
+        return jsonable_encoder(orders)
+    
+    else:
+        HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+
+
+
+
