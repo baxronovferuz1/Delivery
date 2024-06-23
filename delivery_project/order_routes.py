@@ -106,6 +106,22 @@ async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
     current_user=session.query(User).filter(User.username==user).first()
 
     if current_user.is_staff:
-        order=session.query(Order).filter(Order.id==id)
+        order=session.query(Order).filter(Order.id==id).first()
+        custom_order={
+                "id":order.id,
+                "user":{
+                    "id":order.user.id,
+                    "username":order.user.username,
+                    "email":order.user.email
+                },
+                "product_id":order.product_id,
+                "quantity":order.quantity,
+                "order_statuses":order.order_status.value,
+            }
+
+        return jsonable_encoder(custom_order)
+    
+
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only superadmin can you see")
 
 
