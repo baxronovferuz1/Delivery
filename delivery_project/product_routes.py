@@ -137,3 +137,40 @@ async def delete_product(id:int , Authorize:AuthJWT=Depends()):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {id} is not found")
     else:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only superadmin can delete")
+
+
+
+@product_router.put("/{id}", status_code=status.HTTP_200_OK)
+async def update_product(id:int, updated_data:ProductModel, Authorize: AuthJWT=Depends()):
+
+    try:
+        Authorize.jwt_required()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="The user is not authorized,enter valid access token")
+    
+    user=Authorize.get_jwt_subject()
+    current_user=session.query(User).filter(User.username==user).first()
+
+    if current_user.is_staff:
+        product=session.query(Product).filter(Product.id==id).first()
+        if product:
+            for key, value in updated_data.dict(exclude_unset=True).items(): #exlclude_unset=True>agar productni nomi o'zgarsa faqat o'sha fieldni update qiladi(partial)
+                setattr(product,key,value)
+            session.commit()
+            data={
+                "success":True,
+                "code":200,
+                "message":f"ID {id} has been updated",
+                "data":{
+                    "id":product.id,
+                    "name":product.name,
+                    'price':product.price
+
+                }
+            }
+            return jsonable_encoder(data)
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {id} is not found")
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only superadmin can update")
+
