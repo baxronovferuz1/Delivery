@@ -94,7 +94,7 @@ async def order_list(Authorize:AuthJWT=Depends()):
 
 
 
-@order_router.get("/{id}")
+@order_router.get("/{id}", status_code=status.HTTP_200_OK)
 async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
 
 
@@ -108,19 +108,24 @@ async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
 
     if current_user.is_staff:
         order=session.query(Order).filter(Order.id==id).first()
-        custom_order={
-                "id":order.id,
-                "user":{
-                    "id":order.user.id,
-                    "username":order.user.username,
-                    "email":order.user.email
-                },
-                "product_id":order.product_id,
-                "quantity":order.quantity,
-                "order_statuses":order.order_status.value,
-            }
+        if order:
+            custom_order={
+                    "id":order.id,
+                    "user":{
+                        "id":order.user.id,
+                        "username":order.user.username,
+                        "email":order.user.email
+                    },
+                    "product_id":order.product_id,
+                    "quantity":order.quantity,
+                    "order_statuses":order.order_status.value,
+                }
 
-        return jsonable_encoder(custom_order)
+            return jsonable_encoder(custom_order)
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No order found for this id {id}")
+
+            
     
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only superadmin can you see")
