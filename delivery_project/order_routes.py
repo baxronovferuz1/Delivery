@@ -87,9 +87,14 @@ async def order_list(Authorize:AuthJWT=Depends()):
                     "username":order.user.username,
                     "email":order.user.email
                 },
-                "product_id":order.product_id,
+                "product":{
+                    "id":order.product.id,
+                    "name":order.product.name,
+                    "price":order.product.price
+                },
                 "quantity":order.quantity,
                 "order_statuses":order.order_status.value,
+                "total_price":order.quantity*order.product.price
             }
             for order in orders
         ]
@@ -122,9 +127,14 @@ async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
                         "username":order.user.username,
                         "email":order.user.email
                     },
-                    "product_id":order.product_id,
+                    "product":{
+                        "id":order.product.id,
+                        "name":order.product.name,
+                        "price":order.product.price
+                    },
                     "quantity":order.quantity,
                     "order_statuses":order.order_status.value,
+                    'total_price':order.quantity*order.product.price
                 }
 
             return jsonable_encoder(custom_order)
