@@ -38,7 +38,7 @@ async def make_order(order:OrderModel, Authorize:AuthJWT=Depends()):
 
     new_order=Order(
         quantity=order.quantity,
-        #product=order.product_id
+        product=order.product_id
     )
     new_order.user=user
     session.add(new_order)
@@ -49,8 +49,14 @@ async def make_order(order:OrderModel, Authorize:AuthJWT=Depends()):
         "message":"new order succesfully created",
         "data":{
             "id":new_order.id,
+            "product":{
+                "id":new_order.product.id,
+                "name":new_order.product.name,
+                "price":new_order.product.price
+            },
             "quantity":new_order.quantity,
             "order_statuses":new_order.order_status,
+            "total_price":new_order.quantity*new_order.product.price
     }
     }
 

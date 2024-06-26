@@ -110,7 +110,7 @@ async def product_by_id(id:int , Authorize:AuthJWT=Depends()):
 
 
 
-@product_router.delete("/{id}",status_code=status.HTTP_200_OK)
+@product_router.delete("/{id}/delete",status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(id:int , Authorize:AuthJWT=Depends()):
 
     try:
@@ -140,7 +140,7 @@ async def delete_product(id:int , Authorize:AuthJWT=Depends()):
 
 
 
-@product_router.put("/{id}", status_code=status.HTTP_200_OK)
+@product_router.put("/{id}/update", status_code=status.HTTP_200_OK)
 async def update_product(id:int, updated_data:ProductModel, Authorize: AuthJWT=Depends()):
 
     try:
