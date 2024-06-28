@@ -147,3 +147,44 @@ async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only superadmin can you see")
 
 
+@order_router.put("/{id}/update", status_code=status.HTTP_200_OK)
+async def update_order(id:int, order:OrderModel, Authorize:AuthJWT=Depends):
+
+    try:
+        Authorize.jwt_required
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Enter access token!")
+    
+    
+    username=Authorize.get_jwt_subject()
+    user=session.query(User).filter(User.username==username).first()
+
+
+    order_to_update=session.query(Order).filter(Order.id==id).first()
+    if order_to_update.user != user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can not change other's order")
+    
+
+
+    order_to_update.quantity=order.quantity
+    order_to_update.product_id=order.product_id
+    session.commit()
+
+    response={
+        "success":True,
+        "code":200,
+        "message":"Succesfully updated",
+        "data":{
+            "id":order.id,
+            "quantity":order.quantity,
+            "product":order.product_id,
+            "order_status":order.order_statuses,
+        }
+    }
+    return jsonable_encoder(response)
+    
+
+
+
+
+
