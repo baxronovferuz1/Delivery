@@ -55,7 +55,7 @@ async def make_order(order:OrderModel, Authorize:AuthJWT=Depends()):
                 "price":new_order.product.price
             },
             "quantity":new_order.quantity,
-            "order_statuses":new_order.order_status,
+            "order_statuses":new_order.order_statuses,
             "total_price":new_order.quantity*new_order.product.price
     }
     }
@@ -93,7 +93,7 @@ async def order_list(Authorize:AuthJWT=Depends()):
                     "price":order.product.price
                 },
                 "quantity":order.quantity,
-                "order_statuses":order.order_status.value,
+                "order_statuses":order.order_statuses.value,
                 "total_price":order.quantity*order.product.price
             }
             for order in orders
@@ -133,7 +133,7 @@ async def order_by_id(id:int , Authorize:AuthJWT=Depends()):
                         "price":order.product.price
                     },
                     "quantity":order.quantity,
-                    "order_statuses":order.order_status.value,
+                    "order_statuses":order.order_statuses.value,
                     'total_price':order.quantity*order.product.price
                 }
 
@@ -182,6 +182,40 @@ async def update_order(id:int, order:OrderModel, Authorize:AuthJWT=Depends):
         }
     }
     return jsonable_encoder(response)
+
+
+@order_router.patch("{id}/update_status", status_code=status.HTTP_200_OK)
+async def update_order_status(id:int, order=OrderStatusModel, Authorize:AuthJWT=Depends()):
+
+
+    try:
+        Authorize.jwt_required
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Enter access token!")
+    
+    
+    username=Authorize.get_jwt_subject()
+    user=session.query(User).filter(User.username==username).first()
+
+    if user.is_staff:
+        previous_status=session.query(Order).filter(Order.id==id).first()
+        previous_status.order_statuses.value = order.order_statuses
+        session.commit()
+
+        response={
+            "status":True,
+            "code":200,
+            "message":"user order status successfully updated",
+            "data":{
+                "id":previous_status.id,
+                "order_status":previous_status.order_statuses
+            }
+        }
+
+        return jsonable_encoder(response)
+
+
+
     
 
 

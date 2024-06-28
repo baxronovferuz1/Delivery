@@ -30,7 +30,7 @@ class Order(Base):
     __tablename__="orders"
     id=Column(Integer, primary_key=True)
     quantity=Column(Integer, nullable=False)
-    order_status=Column(ChoiceType(choices=ORDER_STATUS), default='PENDING')
+    order_statuses=Column(ChoiceType(choices=ORDER_STATUS), default='PENDING')
     user_id=Column(String, ForeignKey('user.id'))
     user=relationship('User', back_populates='orders')
     product_id=Column(Integer, ForeignKey('product.id'))
