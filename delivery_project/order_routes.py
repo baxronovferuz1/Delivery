@@ -185,7 +185,7 @@ async def update_order(id:int, order:OrderModel, Authorize:AuthJWT=Depends):
 
 
 @order_router.patch("{id}/update_status", status_code=status.HTTP_200_OK)
-async def update_order_status(id:int, order=OrderStatusModel, Authorize:AuthJWT=Depends()):
+async def update_order_status(id:int, order:OrderStatusModel, Authorize:AuthJWT=Depends()):
 
 
     try:
